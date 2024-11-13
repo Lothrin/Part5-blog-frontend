@@ -21,10 +21,11 @@ blogsRouter.get('/', async (request, response) => {
   blogsRouter.post('/', async (request, response) => {
     const body = request.body
 
-    const user = request.user
-    if (!user) {
-      return response.status(401).json({ error: 'user not authenticated' })
-    }
+    const decodedToken = jwt.verify(getTokenFrom(request), process.env.SECRET)
+  if (!decodedToken.id) {
+    return response.status(401).json({ error: 'token invalid' })
+  }
+  const user = await User.findById(decodedToken.id)
 
     if (!body.title || !body.url) {
       return response.status(400).json({

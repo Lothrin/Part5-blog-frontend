@@ -9,6 +9,7 @@ const loginRouter = require('./controllers/login')
 const middleware = require('./utils/middleware')
 const logger = require('./utils/logger')
 const mongoose = require('mongoose')
+require('dotenv').config();
 
 
 mongoose.set('strictQuery', false)

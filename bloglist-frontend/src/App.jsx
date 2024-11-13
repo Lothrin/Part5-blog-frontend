@@ -10,7 +10,7 @@ const App = () => {
   const [newBlogTitle, setNewBlogTitle] = useState('')
   const [newBlogAuthor, setNewBlogAuthor] = useState('')
   const [newBlogUrl, setNewBlogUrl] = useState('')
-  const [errorMessage, setErrorMessage] = useState(null)
+  const [message, setMessage] = useState({text: null, error: true})
   const [username, setUsername] = useState('') 
   const [password, setPassword] = useState('')
   const [user, setUser] = useState(null)
@@ -46,12 +46,17 @@ const App = () => {
     setUser(user)
     setUsername('')
     setPassword('')
+    console.log('Login successful - setting message') 
+    setMessage({ text: `Login successful, logged in as ${user.username}`, error: false })
+  setTimeout(() => {
+    setMessage({ text: null, error: true })
+  }, 5000)
   } catch (exception) {
     console.error('Login failed:', exception) 
-    setErrorMessage('Wrong credentials')
-    setTimeout(() => {
-      setErrorMessage(null)
-    }, 5000)
+    setMessage({ text: 'Wrong Credentials', error: true }) 
+  setTimeout(() => {
+    setMessage({ text: null, error: true })
+  }, 5000)
   }
 }
 
@@ -84,8 +89,17 @@ const handleLogout = () => {
   window.localStorage.removeItem('loggedBlogappUser');
   setUser(null);
   console.log('User has been logged out');
+  setMessage({ text: 'Logout Successful', error: false })
+    
+  setTimeout(() => {
+    setMessage({ text: null, error: true })
+  }, 5000)
 };
+
+
 console.log(user);
+
+
 
 const blogForm = () => (
   <div>
@@ -104,7 +118,7 @@ const blogForm = () => (
   </form></div>
 )
 
-const addBlog = (event) => {
+const addBlog = async (event) => {
   event.preventDefault()
   const blogObject = {
     title: newBlogTitle,
@@ -112,16 +126,27 @@ const addBlog = (event) => {
     url: newBlogUrl
   }
 
-  blogService
-  .create(blogObject)
-  .then(returnedBlog => {
+  try {
+    const returnedBlog = await blogService.create(blogObject)
+    
     setBlogs(blogs.concat(returnedBlog))
     setNewBlogTitle('')
     setNewBlogAuthor('')
     setNewBlogUrl('')
-  })
+    console.log('Blog Added Successfully - setting message')
+    setMessage({ text: `A new blog "${blogObject.title}" by "${blogObject.author}" is added!`, error: false })
+    setTimeout(() => {
+      setMessage({ text: null, error: true })
+    }, 5000)
+  } catch (error) {
+    console.error('Error adding blog:', error)
+    setMessage({ text: 'Failed to add blog', error: true })
+    
+    setTimeout(() => {
+      setMessage({ text: null, error: true })
+    }, 5000)
+  }
 }
-
 const handleBlogTitleChange = (event) => {
   console.log(event.target.value)
   setNewBlogTitle(event.target.value)
@@ -139,12 +164,13 @@ return (
   user === null ? 
     <div>
       <h2>Log in to application</h2>
-      <Notification message={errorMessage} />
+      <Notification message={message.text} error={message.error} />
       {loginForm()}
     </div> 
   : 
     <div>
-      <h2>blogs</h2>
+      <h2>Blogs</h2>
+      <Notification message={message.text} error={message.error} />
       <p>{user.name} logged in <button onClick={handleLogout}>Logout</button></p>
       {blogForm()} 
       {blogs.map(blog =>

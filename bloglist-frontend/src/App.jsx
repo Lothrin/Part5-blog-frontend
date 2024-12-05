@@ -1,63 +1,76 @@
 import { useState, useEffect, useRef } from 'react'
-import Blog from "./components/blog";
-import Notification from "./components/message";
-import blogService from "./services/blogs";
-import loginService from "./services/login";
-import Togglable from "./components/togglable";
-import BlogForm from "./components/blogForm";
+import Blog from './components/blog'
+import Notification from './components/message'
+import blogService from './services/blogs'
+import loginService from './services/login'
+import Togglable from './components/togglable'
+import BlogForm from './components/blogForm'
 
 const App = () => {
-  const [blogs, setBlogs] = useState([]);
-  const [message, setMessage] = useState({ text: null, error: true });
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [user, setUser] = useState(null);
+  const [blogs, setBlogs] = useState([])
+  const [message, setMessage] = useState({ text: null, error: true })
+  const [username, setUsername] = useState('')
+  const [password, setPassword] = useState('')
+  const [user, setUser] = useState(null)
 
   const blogFormRef = useRef()
 
   useEffect(() => {
-    blogService.getAll().then((blogs) => setBlogs(blogs));
-  }, []);
+    blogService.getAll().then((blogs) => setBlogs(blogs))
+  }, [])
 
   useEffect(() => {
-    const loggedUserJSON = window.localStorage.getItem("loggedBlogappUser");
+    const loggedUserJSON = window.localStorage.getItem('loggedBlogappUser')
     if (loggedUserJSON) {
-      const user = JSON.parse(loggedUserJSON);
-      setUser(user);
-      blogService.setToken(user.token);
+      const user = JSON.parse(loggedUserJSON)
+      setUser(user)
+      blogService.setToken(user.token)
     }
-  }, []);
+  }, [])
+
+  const handleDelete = async (id) => {
+    try {
+      await blogService.deleteBlog(id)
+      setBlogs(blogs.filter(blog => blog.id !== id))
+      setMessage({ text: 'Blog deleted successfully!', error: false })
+      setTimeout(() => setMessage({ text: null, error: false }), 5000)
+    } catch (error) {
+      console.error('Error deleting the blog:', error)
+      setMessage({ text: 'Failed to delete blog', error: true })
+      setTimeout(() => setMessage({ text: null, error: false }), 5000)
+    }
+  }
 
   const handleLogin = async (event) => {
-    event.preventDefault();
+    event.preventDefault()
 
     try {
       const user = await loginService.login({
         username,
         password,
-      });
-      console.log("Logged in user:", user);
-      window.localStorage.setItem("loggedBlogappUser", JSON.stringify(user));
-      blogService.setToken(user.token);
-      setUser(user);
-      setUsername("");
-      setPassword("");
-      console.log("Login successful - setting message");
+      })
+      console.log('Logged in user:', user)
+      window.localStorage.setItem('loggedBlogappUser', JSON.stringify(user))
+      blogService.setToken(user.token)
+      setUser(user)
+      setUsername('')
+      setPassword('')
+      console.log('Login successful - setting message')
       setMessage({
         text: `Login successful, logged in as ${user.username}`,
         error: false,
-      });
+      })
       setTimeout(() => {
-        setMessage({ text: null, error: true });
-      }, 5000);
+        setMessage({ text: null, error: true })
+      }, 5000)
     } catch (exception) {
-      console.error("Login failed:", exception);
-      setMessage({ text: "Wrong Credentials", error: true });
+      console.error('Login failed:', exception)
+      setMessage({ text: 'Wrong Credentials', error: true })
       setTimeout(() => {
-        setMessage({ text: null, error: true });
-      }, 5000);
+        setMessage({ text: null, error: true })
+      }, 5000)
     }
-  };
+  }
 
   const loginForm = () => (
     <form onSubmit={handleLogin}>
@@ -81,57 +94,56 @@ const App = () => {
       </div>
       <button type="submit">login</button>
     </form>
-  );
+  )
 
   const handleLogout = () => {
-    window.localStorage.removeItem("loggedBlogappUser");
-    setUser(null);
-    console.log("User has been logged out");
-    setMessage({ text: "Logout Successful", error: false });
+    window.localStorage.removeItem('loggedBlogappUser')
+    setUser(null)
+    console.log('User has been logged out')
+    setMessage({ text: 'Logout Successful', error: false })
 
     setTimeout(() => {
-      setMessage({ text: null, error: true });
-    }, 5000);
-  };
+      setMessage({ text: null, error: true })
+    }, 5000)
+  }
 
-  console.log(user);
+  console.log(user)
 
   const addBlog = async (blogObject) => {
     blogFormRef.current.toggleVisibility()
 
     try {
-      const returnedBlog = await blogService.create(blogObject);
-  
-      setBlogs(blogs.concat(returnedBlog));
-  
-      console.log("Blog Added Successfully - setting message");
-  
+      const returnedBlog = await blogService.create(blogObject)
+
+      setBlogs(blogs.concat(returnedBlog))
+
+      console.log('Blog Added Successfully - setting message')
+
       setMessage({
         text: `A new blog "${blogObject.title}" by "${blogObject.author}" is added!`,
         error: false,
-      });
-  
+      })
+
       setTimeout(() => {
-        setMessage({ text: null, error: false });
-      }, 5000);
+        setMessage({ text: null, error: false })
+      }, 5000)
     } catch (error) {
-      console.error("Error adding blog:", error);
-  
-      setMessage({ text: "Failed to add blog", error: true });
-  
+      console.error('Error adding blog:', error)
+
+      setMessage({ text: 'Failed to add blog', error: true })
+
       setTimeout(() => {
-        setMessage({ text: null, error: false });
-      }, 5000);
+        setMessage({ text: null, error: false })
+      }, 5000)
     }
-  };
-  
+  }
+
 
   const blogForm = () => (
-   <Togglable buttonLabel='new blog' ref={blogFormRef}>
-    <BlogForm createBlog={addBlog} />
-   </Togglable>
-  );
-
+    <Togglable buttonLabel='new blog' ref={blogFormRef}>
+      <BlogForm createBlog={addBlog} />
+    </Togglable>
+  )
 
 
   return user === null ? (
@@ -149,10 +161,10 @@ const App = () => {
       </p>
       {blogForm()}
       {blogs.map((blog) => (
-        <Blog key={blog.id} blog={blog} />
+        <Blog key={blog.id} blog={blog} handleDelete={handleDelete}/>
       ))}
     </div>
-  );
-};
+  )
+}
 
-export default App;
+export default App

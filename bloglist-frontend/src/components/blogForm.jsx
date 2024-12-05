@@ -1,22 +1,22 @@
 import { useState } from 'react'
 
 const BlogForm = ({ createBlog }) => {
-    const [newBlogTitle, setNewBlogTitle] = useState("");
-    const [newBlogAuthor, setNewBlogAuthor] = useState("");
-    const [newBlogUrl, setNewBlogUrl] = useState("");
+  const [newBlogTitle, setNewBlogTitle] = useState('')
+  const [newBlogAuthor, setNewBlogAuthor] = useState('')
+  const [newBlogUrl, setNewBlogUrl] = useState('')
 
-    const addBlog = async (event) => {
-        event.preventDefault();
-        createBlog({
-          title: newBlogTitle,
-          author: newBlogAuthor,
-          url: newBlogUrl,
-        })
+  const addBlog = async (event) => {
+    event.preventDefault()
+    createBlog({
+      title: newBlogTitle,
+      author: newBlogAuthor,
+      url: newBlogUrl,
+    })
 
-        setNewBlogTitle("");
-        setNewBlogAuthor("");
-        setNewBlogUrl("");
-        };
+    setNewBlogTitle('')
+    setNewBlogAuthor('')
+    setNewBlogUrl('')
+  }
 
   return (
     <div>
@@ -26,7 +26,7 @@ const BlogForm = ({ createBlog }) => {
           Title: <input value={newBlogTitle} onChange={ event => setNewBlogTitle(event.target.value)} />
         </p>
         <p>
-          Author:{" "}
+          Author:{' '}
           <input value={newBlogAuthor} onChange={ event => setNewBlogAuthor(event.target.value)} />
         </p>
         <p>
@@ -35,7 +35,7 @@ const BlogForm = ({ createBlog }) => {
         <button type="submit">save</button>
       </form>
     </div>
-  );
-};
+  )
+}
 
 export default BlogForm

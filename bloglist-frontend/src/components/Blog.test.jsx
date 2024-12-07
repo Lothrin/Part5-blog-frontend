@@ -45,4 +45,16 @@ describe("<Blog />", () => {
     expect(likes).toBeDefined();
     expect(username).toBeDefined();
   });
+
+  test("like button is clicked twice, event handler is called twice", async () => {
+    const user = userEvent.setup();
+    const viewButton = screen.getByText("view");
+    await user.click(viewButton);
+
+    const likeButton = screen.getByText("like");
+    await user.click(likeButton);
+    await user.click(likeButton);
+
+    expect(handleLikeMock.mock.calls).toHaveLength(2);
+  });
 });

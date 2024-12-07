@@ -2,7 +2,7 @@ import { useState } from "react";
 import Togglable from "./togglable";
 import blogService from "../services/blogs";
 
-const Blog = ({ blog, handleDelete }) => {
+const Blog = ({ blog, handleDelete, handleLike }) => {
   const [likes, setLikes] = useState(blog.likes);
 
   const blogStyle = {
@@ -13,17 +13,9 @@ const Blog = ({ blog, handleDelete }) => {
     marginBottom: 5,
   };
 
-  const handleLike = async () => {
-    const id = blog.id;
-    const updatedBlog = { ...blog, likes: likes + 1 };
-
-    try {
-      const returnedBlog = await blogService.update(id, updatedBlog);
-
-      setLikes(returnedBlog.likes);
-    } catch (error) {
-      console.error("Error updating the blog:", error);
-    }
+  const handleLikeClick = () => {
+    handleLike(blog.id, likes);
+    setLikes(likes + 1);
   };
 
   const handleDeleteClick = () => {
@@ -38,7 +30,7 @@ const Blog = ({ blog, handleDelete }) => {
       <Togglable buttonLabel="view" className="togglableContent">
         <p>{blog.user.name}</p> <p>{blog.url}</p>
         <p>
-          likes: {likes} <button onClick={handleLike}>like</button>
+          likes: {likes} <button onClick={handleLikeClick}>like</button>
         </p>
         <button onClick={handleDeleteClick}>remove</button>
         <br /> <br />

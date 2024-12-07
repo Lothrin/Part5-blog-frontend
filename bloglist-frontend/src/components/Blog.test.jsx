@@ -1,7 +1,8 @@
 import { render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import Blog from "./blog";
 
-test("renders content with only title and author", () => {
+describe("<Blog />", () => {
   const blog = {
     title: "My Second Blog",
     author: "John Doe",
@@ -10,17 +11,38 @@ test("renders content with only title and author", () => {
     user: { name: "Jane Doe" },
     id: "6720dfc9b0461b136ee63597",
   };
+  const handleLikeMock = vi.fn();
 
-  render(<Blog blog={blog} handleDelete={() => {}} />);
+  beforeEach(() => {
+    render(<Blog blog={blog} handleLike={handleLikeMock} />);
+  });
 
-  screen.debug();
+  test("renders content with only title and author", () => {
+    screen.debug();
 
-  screen.getByText("My Second Blog");
-  screen.getByText("John Doe");
+    screen.getByText("My Second Blog");
+    screen.getByText("John Doe");
 
-  const url = screen.queryByText("http://example.com");
-  const likes = screen.queryByText("likes: 9");
+    const url = screen.queryByText("http://example.com");
+    const likes = screen.queryByText("likes: 9");
 
-  expect(url).toBeNull();
-  expect(likes).toBeNull();
+    expect(url).toBeNull();
+    expect(likes).toBeNull();
+  });
+
+  test("shows url, username and likes after view button is clicked", async () => {
+    const user = userEvent.setup();
+    const button = screen.getByText("view");
+    await user.click(button);
+
+    screen.debug();
+
+    const url = screen.getByText("http://example.com");
+    const likes = screen.getByText("likes: 9");
+    const username = screen.getByText("Jane Doe");
+
+    expect(url).toBeDefined();
+    expect(likes).toBeDefined();
+    expect(username).toBeDefined();
+  });
 });

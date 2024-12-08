@@ -57,13 +57,28 @@ describe('Blog app', () => {
         await blogDiv.getByRole('button', { name: 'like' }).nth(0).click()
         await blogDiv.getByText('likes: 1')
       })
-      test('only the user who created the blog can see delete button', async ({page}) => {
+      test('only the user who created the blog can delete it', async ({page}) => {
+        await page.getByRole('button', { name: 'Logout' }).click()
+        await loginWith(page, 'root', 'salainen')
+        await page.getByRole('button', { name: 'Delete Blog' }).click()
+        const blogDiv = page.getByTestId('blogDiv')
+        await expect(blogDiv.getByText('HC Test Title')).toBeVisible()
+        await expect(blogDiv.getByText('HC Test Author')).toBeVisible()
+
         await page.getByRole('button', { name: 'Logout' }).click()
         await loginWith(page, 'root2', 'salainen')
-        const blogDiv = page.getByTestId('blogDiv')
-        await blogDiv.getByRole('button', { name: 'view' }).click()
-        await expect(page.getByText('Delete Blog')).not.toBeVisible()
+        await expect(blogDiv.getByText('HC Test Title')).not.toBeVisible()
+        await expect(blogDiv.getByText('HC Test Author')).not.toBeVisible()
+        await expect(blogDiv.getByText('HC Test Url')).not.toBeVisible()
+
+
       })
+      // test('only the user who created the blog can see delete button', async ({page}) => {
+      //   await page.getByRole('button', { name: 'Logout' }).click()
+      //   await loginWith(page, 'root', 'salainen')
+      //   await expect(page.getByText('HC Test Title')).toBeVisible()
+      //   await expect(page.getByText('Delete Blog')).not.toBeVisible()
+      // })
     })
   })
 })

@@ -2,7 +2,7 @@ import { useState } from "react";
 import Togglable from "./togglable";
 import blogService from "../services/blogs";
 
-const Blog = ({ blog, handleDelete, handleLike }) => {
+const Blog = ({ blog, handleDelete, handleLike, user }) => {
   const [likes, setLikes] = useState(blog.likes);
 
   const blogStyle = {
@@ -13,31 +13,24 @@ const Blog = ({ blog, handleDelete, handleLike }) => {
     marginBottom: 5,
   };
 
+  const handleDeleteClick = () => {
+    handleDelete(blog.id);
+  };
+
   const handleLikeClick = () => {
     handleLike(blog.id, likes);
     setLikes(likes + 1);
   };
 
-  const handleDeleteClick = () => {
-    if (window.confirm(`Are you sure you want to delete "${blog.title}"?`)) {
-      handleDelete(blog.id);
-    }
-  };
-
-  const loggedUserJSON = window.localStorage.getItem("loggedBlogappUser");
-  const user = JSON.parse(loggedUserJSON);
-
   return (
     <div style={blogStyle} data-testid="blogDiv">
-      <p>{blog.title}</p> <p>{blog.author}</p>
+      <p>{blog.title}</p> <p>{blog.author}</p>{" "}
+      <button onClick={handleDeleteClick}>Delete Blog</button>
       <Togglable buttonLabel="view" className="togglableContent">
         <p>{blog.user.name}</p> <p>{blog.url}</p>
         <p>
           likes: {likes} <button onClick={handleLikeClick}>like</button>
         </p>
-        {blog.user.username === user.username && (
-          <button onClick={handleDeleteClick}>Delete Blog</button>
-        )}
         <br /> <br />
       </Togglable>
     </div>

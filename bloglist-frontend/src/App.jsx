@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import Blog from "./components/blog";
+import Blog from "./components/Blog";
 import Notification from "./components/message";
 import blogService from "./services/blogs";
 import loginService from "./services/login";
@@ -24,6 +24,7 @@ const App = () => {
     if (loggedUserJSON) {
       const user = JSON.parse(loggedUserJSON);
       setUser(user);
+      console.log("User set from localStorage:", user);
       blogService.setToken(user.token);
     }
   }, []);
@@ -185,6 +186,7 @@ const App = () => {
           blog={blog}
           handleDelete={handleDelete}
           handleLike={handleLike}
+          user={user}
         />
       ))}
     </div>

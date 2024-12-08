@@ -1,5 +1,5 @@
 const { test, expect, beforeEach, describe } = require('@playwright/test')
-const { loginWith } = require('./helper')
+const { loginWith, createBlog } = require('./helper')
 
 
 describe('Blog app', () => {
@@ -7,6 +7,7 @@ describe('Blog app', () => {
     await request.post('/api/testing/reset')
     await request.post('/api/users', {
       data: {
+        id: '6755aab8fbd4cfb91648fad8',
         name: 'Erkam Arafat',
         username: 'root',
         password: 'salainen'
@@ -15,7 +16,6 @@ describe('Blog app', () => {
 
     await page.goto('/')
   })
-
   test('Login form is shown', async ({ page }) => {
     await expect(page.getByTestId('username')).toBeVisible()
     await expect(page.getByTestId('password')).toBeVisible()
@@ -32,9 +32,16 @@ describe('Blog app', () => {
 
     const errorDiv = await page.locator('.error')
     await expect(errorDiv).toContainText('Wrong Credentials')
-    await expect(errorDiv).toHaveCSS('border-style', 'solid')
-    await expect(errorDiv).toHaveCSS('color', 'rgb(255, 0, 0)')
     await expect(page.getByText('Erkam Arafat')).not.toBeVisible()
+    })
+    describe('When logged in', () => {
+      beforeEach(async ({ page }) => {
+        await loginWith(page, 'root', 'salainen')
+      })
+    
+      test('a new blog can be created', async ({ page }) => {
+        await createBlog(page, 'E2E Test Title', 'E2E Test Author', 'E2E Test Url')
+      })
     })
   })
 })

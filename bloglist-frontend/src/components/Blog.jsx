@@ -25,7 +25,7 @@ const Blog = ({ blog, handleDelete, handleLike }) => {
   };
 
   return (
-    <div style={blogStyle}>
+    <div style={blogStyle} data-testid="blogDiv">
       <p>{blog.title}</p> <p>{blog.author}</p>
       <Togglable buttonLabel="view" className="togglableContent">
         <p>{blog.user.name}</p> <p>{blog.url}</p>

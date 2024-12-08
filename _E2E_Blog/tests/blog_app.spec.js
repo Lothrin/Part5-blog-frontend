@@ -42,6 +42,12 @@ describe('Blog app', () => {
       test('a new blog can be created', async ({ page }) => {
         await createBlog(page, 'E2E Test Title', 'E2E Test Author', 'E2E Test Url')
       })
+      test('a new blog can be liked', async ({ page }) => {
+        await createBlog(page, 'E2E Test Title', 'E2E Test Author', 'E2E Test Url')
+        const blogDiv = page.getByTestId('blogDiv')
+        await blogDiv.getByRole('button', { name: 'like' }).click()
+        await blogDiv.getByText('likes: 1')
+      } )
     })
   })
 })

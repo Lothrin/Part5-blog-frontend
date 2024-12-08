@@ -24,6 +24,9 @@ const Blog = ({ blog, handleDelete, handleLike }) => {
     }
   };
 
+  const loggedUserJSON = window.localStorage.getItem("loggedBlogappUser");
+  const user = JSON.parse(loggedUserJSON);
+
   return (
     <div style={blogStyle} data-testid="blogDiv">
       <p>{blog.title}</p> <p>{blog.author}</p>
@@ -32,7 +35,9 @@ const Blog = ({ blog, handleDelete, handleLike }) => {
         <p>
           likes: {likes} <button onClick={handleLikeClick}>like</button>
         </p>
-        <button onClick={handleDeleteClick}>remove</button>
+        {blog.user.username === user.username && (
+          <button onClick={handleDeleteClick}>Delete Blog</button>
+        )}
         <br /> <br />
       </Togglable>
     </div>

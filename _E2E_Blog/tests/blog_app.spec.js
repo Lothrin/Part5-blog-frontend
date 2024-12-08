@@ -13,6 +13,14 @@ describe('Blog app', () => {
         password: 'salainen'
       }
     })
+    await request.post('/api/users', {
+      data: {
+        id: '6755aab8fbd4cfb91648fad2',
+        name: 'Mustafa Arafat',
+        username: 'root2',
+        password: 'salainen'
+      }
+    })
 
     await page.goto('/')
   })
@@ -36,7 +44,8 @@ describe('Blog app', () => {
     })
     describe('When logged in', () => {
       beforeEach(async ({ page }) => {
-        await loginWith(page, 'root', 'salainen')
+        await loginWith(page, 'root2', 'salainen')
+        await createBlog(page, 'HC Test Title', 'HC Test Author', 'HC Test Url')
       })
     
       test('a new blog can be created', async ({ page }) => {
@@ -45,9 +54,16 @@ describe('Blog app', () => {
       test('a new blog can be liked', async ({ page }) => {
         await createBlog(page, 'E2E Test Title', 'E2E Test Author', 'E2E Test Url')
         const blogDiv = page.getByTestId('blogDiv')
-        await blogDiv.getByRole('button', { name: 'like' }).click()
+        await blogDiv.getByRole('button', { name: 'like' }).nth(0).click()
         await blogDiv.getByText('likes: 1')
-      } )
+      })
+      test('only the user who created the blog can see delete button', async ({page}) => {
+        await page.getByRole('button', { name: 'Logout' }).click()
+        await loginWith(page, 'root2', 'salainen')
+        const blogDiv = page.getByTestId('blogDiv')
+        await blogDiv.getByRole('button', { name: 'view' }).click()
+        await expect(page.getByText('Delete Blog')).not.toBeVisible()
+      })
     })
   })
 })

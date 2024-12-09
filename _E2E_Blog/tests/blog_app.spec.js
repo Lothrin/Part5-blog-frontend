@@ -73,6 +73,31 @@ describe('Blog app', () => {
         await expect(blogDiv.getByText('HC Test Title')).toBeVisible()
         await expect(blogDiv.getByText('Delete Blog')).not.toBeVisible()
       })
+
+      test('blogs are ordered by likes, most liked first', async ({ page }) => {
+        page.reload() //the user data that is passed to the blog in the backend has to be updated in FE
+        const blogDiv = page.getByTestId('blogDiv')
+        await blogDiv.getByRole('button', { name: 'Delete Blog' }).click()
+
+        await createBlog(page, 'Blog 1', 'Author 1', 'http://test1.com');
+        await createBlog(page, 'Blog 2', 'Author 2', 'http://test2.com');
+        await createBlog(page, 'Blog 3', 'Author 3', 'http://test3.com');
+
+        await blogDiv.getByRole('button', { name: 'like' }).nth(2).click()
+        await blogDiv.getByRole('button', { name: 'like' }).nth(1).click()
+        await blogDiv.getByRole('button', { name: 'like' }).nth(2).click()
+        await page.waitForTimeout(3000);
+
+        await expect(blogDiv.nth(0).getByText('Blog 3')).toBeVisible()
+        await expect(blogDiv.nth(0).getByText('Author 3')).toBeVisible()
+        await expect(blogDiv.nth(0).getByText('http://test3.com')).toBeVisible()
+        await expect(blogDiv.nth(0).getByText('likes: 2')).toBeVisible()
+
+        await expect(blogDiv.nth(1).getByText('Blog 2')).toBeVisible()
+        await expect(blogDiv.nth(1).getByText('Author 2')).toBeVisible()
+        await expect(blogDiv.nth(1).getByText('http://test2.com')).toBeVisible()
+        await expect(blogDiv.nth(1).getByText('likes: 1')).toBeVisible()
+      });      
     })
   })
 })

@@ -17,9 +17,12 @@ const Blog = ({ blog, handleDelete, handleLike, user }) => {
     handleDelete(blog.id);
   };
 
-  const handleLikeClick = () => {
-    handleLike(blog.id, likes);
-    setLikes(likes + 1);
+  const handleLikeClick = async () => {
+    const newLikes = likes + 1;
+
+    await handleLike(blog.id, newLikes);
+
+    setLikes(newLikes);
   };
 
   return (

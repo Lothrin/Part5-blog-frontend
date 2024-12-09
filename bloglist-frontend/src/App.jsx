@@ -55,6 +55,9 @@ const App = () => {
         const returnedBlog = await blogService.update(id, updatedBlog);
 
         setBlogs(blogs.map((blog) => (blog.id === id ? returnedBlog : blog)));
+        blogService.getAll().then((blogs) => {
+          setBlogs(blogs);
+        });
       } catch (error) {
         console.error("Error updating the blog:", error);
       }

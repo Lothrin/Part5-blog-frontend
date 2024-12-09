@@ -91,6 +91,7 @@ const App = () => {
       }, 5000);
     }
   };
+  console.log(user);
 
   const loginForm = () => (
     <form onSubmit={handleLogin}>
@@ -129,13 +130,19 @@ const App = () => {
     }, 5000);
   };
 
-  console.log(user);
-
   const addBlog = async (blogObject) => {
     blogFormRef.current.toggleVisibility();
 
     try {
-      const returnedBlog = await blogService.create(blogObject);
+      const blogWithUser = {
+        ...blogObject,
+        user: {
+          id: user.id,
+          username: user.username,
+        },
+      };
+
+      const returnedBlog = await blogService.create(blogWithUser);
 
       setBlogs(blogs.concat(returnedBlog));
 
@@ -162,7 +169,7 @@ const App = () => {
 
   const blogForm = () => (
     <Togglable buttonLabel="new blog" ref={blogFormRef}>
-      <BlogForm createBlog={addBlog} />
+      <BlogForm createBlog={addBlog} user={user} />
     </Togglable>
   );
 

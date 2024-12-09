@@ -25,7 +25,9 @@ const Blog = ({ blog, handleDelete, handleLike, user }) => {
   return (
     <div style={blogStyle} data-testid="blogDiv">
       <p>{blog.title}</p> <p>{blog.author}</p>{" "}
-      <button onClick={handleDeleteClick}>Delete Blog</button>
+      {blog.user.username === user.username && (
+        <button onClick={handleDeleteClick}>Delete Blog</button>
+      )}
       <Togglable buttonLabel="view" className="togglableContent">
         <p>{blog.user.name}</p> <p>{blog.url}</p>
         <p>

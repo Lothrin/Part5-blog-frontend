@@ -7,7 +7,6 @@ describe('Blog app', () => {
     await request.post('/api/testing/reset')
     await request.post('/api/users', {
       data: {
-        id: '6755aab8fbd4cfb91648fad8',
         name: 'Erkam Arafat',
         username: 'root',
         password: 'salainen'
@@ -15,7 +14,6 @@ describe('Blog app', () => {
     })
     await request.post('/api/users', {
       data: {
-        id: '6755aab8fbd4cfb91648fad2',
         name: 'Mustafa Arafat',
         username: 'root2',
         password: 'salainen'
@@ -44,7 +42,7 @@ describe('Blog app', () => {
     })
     describe('When logged in', () => {
       beforeEach(async ({ page }) => {
-        await loginWith(page, 'root2', 'salainen')
+        await loginWith(page, 'root', 'salainen')
         await createBlog(page, 'HC Test Title', 'HC Test Author', 'HC Test Url')
       })
     
@@ -58,27 +56,23 @@ describe('Blog app', () => {
         await blogDiv.getByText('likes: 1')
       })
       test('only the user who created the blog can delete it', async ({page}) => {
-        await page.getByRole('button', { name: 'Logout' }).click()
-        await loginWith(page, 'root', 'salainen')
-        await page.getByRole('button', { name: 'Delete Blog' }).click()
+        page.reload() //the user data that is passed to the blog in the backend has to be updated in FE
         const blogDiv = page.getByTestId('blogDiv')
-        await expect(blogDiv.getByText('HC Test Title')).toBeVisible()
-        await expect(blogDiv.getByText('HC Test Author')).toBeVisible()
-
-        await page.getByRole('button', { name: 'Logout' }).click()
-        await loginWith(page, 'root2', 'salainen')
+        await blogDiv.getByRole('button', { name: 'Delete Blog' }).click()
         await expect(blogDiv.getByText('HC Test Title')).not.toBeVisible()
         await expect(blogDiv.getByText('HC Test Author')).not.toBeVisible()
         await expect(blogDiv.getByText('HC Test Url')).not.toBeVisible()
-
-
       })
-      // test('only the user who created the blog can see delete button', async ({page}) => {
-      //   await page.getByRole('button', { name: 'Logout' }).click()
-      //   await loginWith(page, 'root', 'salainen')
-      //   await expect(page.getByText('HC Test Title')).toBeVisible()
-      //   await expect(page.getByText('Delete Blog')).not.toBeVisible()
-      // })
+      test('only the user who created the blog can see delete button', async ({page}) => {
+        page.reload() //the user data that is passed to the blog in the backend has to be updated in FE
+        const blogDiv = page.getByTestId('blogDiv')
+        await expect(blogDiv.getByText('HC Test Title')).toBeVisible()
+        await expect(blogDiv.getByText('Delete Blog')).toBeVisible()
+        await page.getByRole('button', { name: 'Logout' }).click()
+        await loginWith(page, 'root2', 'salainen')
+        await expect(blogDiv.getByText('HC Test Title')).toBeVisible()
+        await expect(blogDiv.getByText('Delete Blog')).not.toBeVisible()
+      })
     })
   })
 })
